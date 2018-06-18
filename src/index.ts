@@ -1,6 +1,11 @@
-import { JsonApiMatchDataStore } from "./DataStore/MatchDataStore"
+import { JsonApiMatchDataStore, createJsonApiMatchDataStore } from "./DataStore/MatchDataStore"
 
-const jsonApiMatchDataStore = new JsonApiMatchDataStore()
-jsonApiMatchDataStore.getCurrentMatches().then(response => {
-  console.log(response)
-})
+const jsonApiMatchDataStore = createJsonApiMatchDataStore()
+jsonApiMatchDataStore
+  .getUpdatedMatches(new Date())
+  .then(response => {
+    console.log(response)
+  })
+  .catch((err: Error) => {
+    console.log(err)
+  })

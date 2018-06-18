@@ -1,33 +1,53 @@
 import axios from "axios"
 import { Match } from "../Entity/Match"
-import {
-  JsonApiMatchesResponse,
-  JsonApiMatchesResponseScore,
-} from "./JsonApiMatchesResponse"
 import { Score } from "../Entity/Score"
+import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
+import { MatchRepository } from "../Repository/MatchRepository"
+import {
+  ChangeMatchDateDataStore,
+  AwsS3ChangeMatchDateDataStore,
+} from "./AwsS3ChangeMatchDateDataStore"
 
-export interface MatchDataStore {
-  getCurrentMatches(): Promise<Match[]>
-  getPreviousMatches(): Match[]
+interface ResponseMatch extends Match {
+  updatedAt: Date
 }
 
-export class JsonApiMatchDataStore implements MatchDataStore {
+export function createJsonApiMatchDataStore() {
+  return new JsonApiMatchDataStore(new AwsS3ChangeMatchDateDataStore())
+}
+
+export class JsonApiMatchDataStore implements MatchRepository {
   private requestUrl = "https://www.sofascore.com/tennis/livescore/json"
 
-  async getCurrentMatches(): Promise<Match[]> {
+  private changeMatchDateDataStore: ChangeMatchDateDataStore
+
+  constructor(changeMatchDateDataStore: ChangeMatchDateDataStore) {
+    this.changeMatchDateDataStore = changeMatchDateDataStore
+  }
+
+  async getUpdatedMatches(date: Date): Promise<Match[]> {
     const response = await axios.get<JsonApiMatchesResponse>(this.requestUrl, {
-      params: getQueryParams(new Date()),
+      params: getQueryParams(date),
     })
+
+    const previousUpdatedAt = await this.changeMatchDateDataStore.get()
+
     const data = response.data
-    return mapToMatches(data)
-  }
+    const allMatches = mapToResponseMatches(data)
 
-  getPreviousMatches(): Match[] {
-    return []
-  }
+    const matches = allMatches.filter(match => {
+      const tournamentName = match.tournamentName
 
-  private save(): Promise<void> {
-    return new Promise(() => {})
+      return (
+        match.tournamentType === "ATP" &&
+        tournamentName.indexOf("Doubles") === -1 &&
+        match.updatedAt > previousUpdatedAt
+      )
+    })
+
+    await this.changeMatchDateDataStore.save(date)
+
+    return matches
   }
 }
 
@@ -46,34 +66,29 @@ export function getQueryParams(date: Date): SofaScoreRequestParams {
   }
 }
 
-function mapToMatches(jsonData: JsonApiMatchesResponse): Match[] {
-  const result: Match[] = []
-  const atpTournaments = jsonData.sportItem.tournaments.filter(tournament => {
-    const tournamentName = tournament.category.name
-    return tournamentName === "ATP" && tournamentName.indexOf("Doubles") === -1
-  })
+function mapToResponseMatches(jsonData: JsonApiMatchesResponse): ResponseMatch[] {
+  const result: ResponseMatch[] = []
+  const atpTournaments = jsonData.sportItem.tournaments
 
   atpTournaments.forEach(tournament => {
     tournament.events.forEach(event => {
       result.push({
         id: event.id,
+        tournamentType: tournament.category.name,
         tournamentName: tournament.tournament.name,
         homeScore: mapToScore(event.homeScore),
         homePlayer: {
           id: event.homeTeam.id,
-          imageUrl: `https://www.sofascore.com/images/team-logo/tennis_${
-            event.homeTeam.id
-          }.png`,
+          imageUrl: `https://www.sofascore.com/images/team-logo/tennis_${event.homeTeam.id}.png`,
           name: event.homeTeam.name,
         },
         awayScore: mapToScore(event.awayScore),
         awayPlayer: {
           id: event.awayTeam.id,
-          imageUrl: `https://www.sofascore.com/images/team-logo/tennis_${
-            event.awayTeam.id
-          }.png`,
+          imageUrl: `https://www.sofascore.com/images/team-logo/tennis_${event.awayTeam.id}.png`,
           name: event.awayTeam.name,
         },
+        updatedAt: new Date(event.changes.changeDate),
       })
     })
   })
