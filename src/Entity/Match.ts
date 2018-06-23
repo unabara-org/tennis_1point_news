@@ -28,10 +28,22 @@ export class Match {
     this.homePlayer = props.homePlayer
     this.awayScore = props.awayScore
     this.awayPlayer = props.awayPlayer
-
   }
 
   getMatchName(): string {
-    return `${this.tournamentName} ${this.homePlayer.name} vs ${this.awayPlayer.name} ��`
+    return `${this.tournamentName} | ${this.homePlayer.name} vs ${this.awayPlayer.name}`
+  }
+
+  getSetScoreText(): string {
+    return `${this.homeScore.winnerSet}-${this.awayScore.winnerSet}`
+  }
+
+  getGameScoreText(): string {
+    const latestGameIndex = this.homeScore.game.length - 1
+    return `${this.homeScore.game[latestGameIndex]}-${this.awayScore.game[latestGameIndex]}`
+  }
+
+  getPointScoreText(): string {
+    return `${this.homeScore.point}-${this.awayScore.point}`
   }
 }

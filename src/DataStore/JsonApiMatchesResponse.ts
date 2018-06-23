@@ -39,7 +39,7 @@ type WinnerCode = 0 | 1 | 2
 
 export interface JsonApiMatchesResponseScore {
   current: number
-  point: number
+  point: any
   // period1?: number
   // period2?: number
   // period3?: number

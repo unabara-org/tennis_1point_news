@@ -124,6 +124,6 @@ export function mapToScore(responseScore: JsonApiMatchesResponseScore): Score {
   return {
     winnerSet: responseScore.current,
     game: game,
-    point: responseScore.point,
+    point: responseScore.point ? responseScore.point : 0,
   }
 }

@@ -8,7 +8,7 @@ export interface ChangeMatchDateDataStore {
 export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
   private readonly s3 = new aws.S3()
   private readonly params = {
-    Bucket: "tennis-1point-news",
+    Bucket: "tennis-1point-notice",
     Key: "changeDate.json",
   }
 
