@@ -7,8 +7,16 @@ import {
   ChangeMatchDateDataStore,
   AwsS3ChangeMatchDateDataStore,
 } from "./AwsS3ChangeMatchDateDataStore"
+import { Player } from "../Entity/Player"
 
-interface ResponseMatch extends Match {
+interface ResponseMatch {
+  id: number
+  tournamentType: string
+  tournamentName: string
+  homeScore: Score
+  homePlayer: Player
+  awayScore: Score
+  awayPlayer: Player
   updatedAt: Date
 }
 
@@ -35,15 +43,19 @@ export class JsonApiMatchDataStore implements MatchRepository {
     const data = response.data
     const allMatches = mapToResponseMatches(data)
 
-    const matches = allMatches.filter(match => {
-      const tournamentName = match.tournamentName
+    const matches = allMatches
+      .filter(match => {
+        const tournamentName = match.tournamentName
 
-      return (
-        match.tournamentType === "ATP" &&
-        tournamentName.indexOf("Doubles") === -1 &&
-        match.updatedAt > previousUpdatedAt
-      )
-    })
+        return (
+          match.tournamentType === "ATP" &&
+          tournamentName.indexOf("Doubles") === -1 &&
+          match.updatedAt > previousUpdatedAt
+        )
+      })
+      .map(responseMatch => {
+        return new Match(responseMatch)
+      })
 
     await this.changeMatchDateDataStore.save(date)
 
