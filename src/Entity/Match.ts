@@ -44,6 +44,9 @@ export class Match {
   }
 
   getPointScoreText(): string {
+    if (this.homeScore.point == null || this.awayScore.point == null) {
+      return ''
+    }
     return `${this.homeScore.point}-${this.awayScore.point}`
   }
 }
