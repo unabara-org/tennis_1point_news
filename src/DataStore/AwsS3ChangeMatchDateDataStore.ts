@@ -7,9 +7,14 @@ export interface ChangeMatchDateDataStore {
 
 export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
   private readonly s3 = new aws.S3()
-  private readonly params = {
-    Bucket: "tennis-1point-notice",
-    Key: "changeDate.json",
+  private readonly bucketName = "tennis-1point-notice"
+  private readonly objectKey = "changeDate.json"
+  private readonly bucketParams = {
+    Bucket: this.bucketName,
+  }
+  private readonly changeDateObjectParams = {
+    Bucket: this.bucketName,
+    Key: this.objectKey,
   }
 
   async get(): Promise<Date> {
@@ -18,7 +23,7 @@ export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
     let result: Date | undefined = undefined
 
     try {
-      const data = await this.promisifiedGetObject(this.params)
+      const data = await this.promisifiedGetObject(this.changeDateObjectParams)
 
       if (data.Body == null) {
         throw new Error("s3.getObjectの戻り値であるdata.Bodyがnullもしくはundefinedです")
@@ -41,7 +46,7 @@ export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
       changeDate: date.toString(),
     }
     const saveParams = {
-      ...this.params,
+      ...this.changeDateObjectParams,
       Body: JSON.stringify(body),
     }
 
@@ -54,13 +59,29 @@ export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
   }
 
   private initializeForGet(): Promise<void> {
+    return this.exitsBucket().then(exists => {
+      if (exists) {
+        return undefined
+      }
+
+      this.s3.createBucket({ Bucket: this.changeDateObjectParams.Bucket }, (err, data) => {
+        if (err) {
+          Promise.reject(err)
+        }
+
+        Promise.resolve()
+      })
+    })
+  }
+
+  private exitsBucket(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.s3.createBucket({ Bucket: this.params.Bucket }, (err, data) => {
+      this.s3.headBucket(this.bucketParams, (err, data) => {
         if (err) {
           reject(err)
         }
 
-        resolve()
+        resolve(data !== null)
       })
     })
   }

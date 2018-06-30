@@ -2,22 +2,30 @@
   "name": "tennis_test",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "handler.js",
   "scripts": {
+    "build": "webpack",
+    "deploy": "sls deploy",
     "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/aws-lambda": "0.0.22",
     "@types/jest": "^23.1.0",
     "@types/node": "^10.3.2",
     "aws-sdk": "^2.259.1",
     "axios": "^0.18.0",
     "jest": "^23.1.0",
     "prettier": "^1.13.5",
+    "serverless": "^1.27.3",
+    "serverless-webpack": "^4.0.0",
+    "source-map-support": "^0.5.0",
     "ts-jest": "^22.4.6",
+    "ts-loader": "^2.3.7",
     "ts-node": "^6.1.1",
-    "typescript": "^2.9.1"
+    "typescript": "^2.9.2",
+    "webpack": "^3.6.0"
   },
   "jest": {
     "transform": {
