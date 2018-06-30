@@ -1,6 +1,5 @@
 import { Match } from "../Entity/Match"
-import axios from "axios";
-import { ServerRequest } from "http";
+import axios from "axios"
 
 interface PostMatchService {
   execute(match: Match): Promise<void>
@@ -18,8 +17,7 @@ interface RequestBodyField {
 }
 
 export class SlackApiPostMatchService implements PostMatchService {
-  private readonly requestUrl =
-    "https://hooks.slack.com/services/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"
+  private readonly requestUrl = process.env.SLACK_WEBHOOK_URL
 
   async execute(match: Match): Promise<void> {
     const requestJsonData: RequestBody = {
@@ -30,24 +28,24 @@ export class SlackApiPostMatchService implements PostMatchService {
             {
               title: "セット",
               value: match.getSetScoreText(),
-              short: true
+              short: true,
             },
             {
               title: "ゲーム",
               value: match.getGameScoreText(),
-              short: true
+              short: true,
             },
             {
               title: "ポイント",
               value: match.getPointScoreText(),
-              short: false
-            }
-          ]
-        }
-      ]
+              short: false,
+            },
+          ],
+        },
+      ],
     }
 
-    const response = await axios.post(this.requestUrl, requestJsonData)
+    const response = await axios.post(this.requestUrl!, requestJsonData)
     if (response.status === 200) {
       return undefined
     } else {
