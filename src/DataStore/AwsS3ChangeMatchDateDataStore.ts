@@ -1,11 +1,7 @@
 import aws from "aws-sdk"
+import { ChangeMatchDateRepository } from "../Repository/ChangeMatchDataRepository";
 
-export interface ChangeMatchDateDataStore {
-  get(): Promise<Date>
-  save(date: Date): Promise<void>
-}
-
-export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateDataStore {
+export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateRepository {
   private readonly s3 = new aws.S3()
   private readonly bucketName = "tennis-1point-notice"
   private readonly objectKey = "changeDate.json"

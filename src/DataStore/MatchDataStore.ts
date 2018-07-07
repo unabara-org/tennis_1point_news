@@ -4,10 +4,10 @@ import { Score } from "../Entity/Score"
 import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
 import { MatchRepository } from "../Repository/MatchRepository"
 import {
-  ChangeMatchDateDataStore,
   AwsS3ChangeMatchDateDataStore,
 } from "./AwsS3ChangeMatchDateDataStore"
 import { Player } from "../Entity/Player"
+import { ChangeMatchDateRepository } from "../Repository/ChangeMatchDataRepository";
 
 interface ResponseMatch {
   id: number
@@ -27,9 +27,9 @@ export function createJsonApiMatchDataStore() {
 export class JsonApiMatchDataStore implements MatchRepository {
   private requestUrl = "https://www.sofascore.com/tennis/livescore/json"
 
-  private changeMatchDateDataStore: ChangeMatchDateDataStore
+  private changeMatchDateDataStore: ChangeMatchDateRepository
 
-  constructor(changeMatchDateDataStore: ChangeMatchDateDataStore) {
+  constructor(changeMatchDateDataStore: ChangeMatchDateRepository) {
     this.changeMatchDateDataStore = changeMatchDateDataStore
   }
 
