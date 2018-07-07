@@ -1,9 +1,10 @@
-import { JsonApiMatchDataStore, createJsonApiMatchDataStore } from "./DataStore/MatchDataStore"
+import { JsonApiMatchDataStore } from "./DataStore/MatchDataStore/JsonApiMatchDataStore"
 import { SlackApiPostMatchService } from "./Service/SlackApiService"
 import { APIGatewayEvent, Callback, Context, Handler } from "aws-lambda"
+import { createMatchRepository } from "./Repository/MatchRepository"
 
 const executeSendNotification = (): Promise<void> => {
-  const jsonApiMatchDataStore = createJsonApiMatchDataStore()
+  const jsonApiMatchDataStore = createMatchRepository()
   return jsonApiMatchDataStore.getUpdatedMatches(new Date()).then(matches => {
     console.log(matches)
     const slackApiPostMatchService = new SlackApiPostMatchService()

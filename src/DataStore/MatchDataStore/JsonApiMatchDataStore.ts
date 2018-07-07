@@ -1,13 +1,11 @@
 import axios from "axios"
-import { Match } from "../Entity/Match"
-import { Score } from "../Entity/Score"
+import { Match } from "../../Entity/Match"
+import { Score } from "../../Entity/Score"
 import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
-import { MatchRepository } from "../Repository/MatchRepository"
-import {
-  AwsS3ChangeMatchDateDataStore,
-} from "./AwsS3ChangeMatchDateDataStore"
-import { Player } from "../Entity/Player"
-import { ChangeMatchDateRepository } from "../Repository/ChangeMatchDataRepository";
+import { MatchRepository } from "../../Repository/MatchRepository"
+import { AwsS3ChangeMatchDateDataStore } from "../ChangeMatchDateDataStore/AwsS3ChangeMatchDateDataStore"
+import { Player } from "../../Entity/Player"
+import { ChangeMatchDateRepository } from "../../Repository/ChangeMatchDataRepository"
 
 interface ResponseMatch {
   id: number
@@ -18,10 +16,6 @@ interface ResponseMatch {
   awayScore: Score
   awayPlayer: Player
   updatedAt: Date
-}
-
-export function createJsonApiMatchDataStore() {
-  return new JsonApiMatchDataStore(new AwsS3ChangeMatchDateDataStore())
 }
 
 export class JsonApiMatchDataStore implements MatchRepository {

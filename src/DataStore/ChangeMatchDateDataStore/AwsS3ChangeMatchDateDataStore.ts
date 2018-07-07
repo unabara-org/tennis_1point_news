@@ -1,5 +1,5 @@
 import aws from "aws-sdk"
-import { ChangeMatchDateRepository } from "../Repository/ChangeMatchDataRepository";
+import { ChangeMatchDateRepository } from "../../Repository/ChangeMatchDataRepository"
 
 export class AwsS3ChangeMatchDateDataStore implements ChangeMatchDateRepository {
   private readonly s3 = new aws.S3()

@@ -1,4 +1,4 @@
-import { getQueryParams, mapToScore } from "./MatchDataStore"
+import { getQueryParams, mapToScore } from "./JsonApiMatchDataStore"
 
 test("getQueryParams", () => {
   const date1 = new Date(2018, 5, 17) // Unix Time は 1529161200
