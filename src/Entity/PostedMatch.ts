@@ -1,6 +1,6 @@
 export interface PostedMatch {
-  matchId: PostedId
-  postedId: string
+  postedMatchId: PostedMatchId
+  matchId: number
 }
 
-export type PostedId = number
+export type PostedMatchId = string
