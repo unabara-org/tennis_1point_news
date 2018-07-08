@@ -1,11 +1,14 @@
 import { Match } from "../Entity/Match"
 import axios from "axios"
+import { PostedMatch, PostedMatchId } from "../Entity/PostedMatch"
 
 interface PostMatchService {
-  execute(match: Match): Promise<void>
+  post(match: Match): Promise<PostedMatch>
 }
 
 interface RequestBody {
+  token: string
+  channel: string
   username: string
   attachments: Array<{ fields: RequestBodyField[] }>
 }
@@ -17,10 +20,14 @@ interface RequestBodyField {
 }
 
 export class SlackApiPostMatchService implements PostMatchService {
-  private readonly requestUrl = process.env.SLACK_WEBHOOK_URL
+  private readonly requestUrl = "https://slack.com/api/chat.postMessage"
+  private readonly token = process.env.SLACK_TOKEN!
+  private readonly channelNameId = process.env.SLACK_CHANNEL_NAME_ID!
 
-  async execute(match: Match): Promise<void> {
+  async post(match: Match): Promise<PostedMatch> {
     const requestJsonData: RequestBody = {
+      token: this.token,
+      channel: this.channelNameId,
       username: match.getMatchName(),
       attachments: [
         {
@@ -45,11 +52,33 @@ export class SlackApiPostMatchService implements PostMatchService {
       ],
     }
 
-    const response = await axios.post(this.requestUrl!, requestJsonData)
-    if (response.status === 200) {
-      return undefined
+    const response = await axios.post<PostResponse>(this.requestUrl!, requestJsonData, {
+      headers: {
+        Authorization: "Bearer " + this.token,
+      },
+    })
+    if (response.status === 200 && response.data.ok) {
+      return {
+        postedMatchId: response.data.ts,
+        matchId: match.id,
+      }
     } else {
-      throw new Error("SlackAPIへリクエストを投げた際にHTTPステータスが200以外で返ってきました")
+      throw new Error("SlackAPIへのリクエストが失敗した")
     }
+  }
+}
+
+interface PostResponse {
+  ok: boolean
+  channel: string
+  ts: PostedMatchId
+  message: {
+    text: string
+    username: string
+    bot_id: string
+    attachments: any
+    type: string
+    subtype: string
+    ts: PostedMatchId
   }
 }
