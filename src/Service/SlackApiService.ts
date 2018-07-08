@@ -4,6 +4,7 @@ import { PostedMatch, PostedMatchId } from "../Entity/PostedMatch"
 
 interface PostMatchService {
   post(match: Match): Promise<PostedMatch>
+  update(postedMatchId: PostedMatchId, match: Match): Promise<void>
 }
 
 interface RequestBody {
