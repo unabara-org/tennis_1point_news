@@ -1,17 +1,29 @@
-import { JsonApiMatchDataStore } from "./DataStore/MatchDataStore/JsonApiMatchDataStore"
-import { SlackApiPostMatchService } from "./Service/SlackApiService"
-import { APIGatewayEvent, Callback, Context, Handler } from "aws-lambda"
+import { APIGatewayEvent, Context, Handler } from "aws-lambda"
 import { createMatchRepository } from "./Repository/MatchRepository"
+import { createPostedMatchRepository } from "./Repository/PostedMatchRepository"
+import { SlackApiPostMatchService } from "./Service/SlackApiService"
 
-const executeSendNotification = (): Promise<void> => {
+const executeSendNotification = async (): Promise<void> => {
   const jsonApiMatchDataStore = createMatchRepository()
-  return jsonApiMatchDataStore.getUpdatedMatches(new Date()).then(matches => {
-    console.log(matches)
-    const slackApiPostMatchService = new SlackApiPostMatchService()
-    matches.forEach(match => {
-      slackApiPostMatchService.execute(match)
+  const matches = await jsonApiMatchDataStore.getUpdatedMatches(new Date())
+  const slackApiPostMatchService = new SlackApiPostMatchService()
+  const postedMatchRepository = createPostedMatchRepository()
+
+  // S3のファイル名一覧を取得する
+  const postedMatches = await postedMatchRepository.findAllPostedMatches()
+
+  for (const match of matches) {
+    const postedMatch = postedMatches.find(postedM => {
+      return postedM.matchId === match.id
     })
-  })
+
+    if (postedMatch == null) {
+      const postedMatch = await slackApiPostMatchService.post(match)
+      await postedMatchRepository.save(postedMatch.postedMatchId, match)
+    } else {
+      await slackApiPostMatchService.update(postedMatch.postedMatchId, match)
+    }
+  }
 }
 
 export const sendNotification: Handler = (
