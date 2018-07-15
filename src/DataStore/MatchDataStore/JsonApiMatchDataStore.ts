@@ -11,6 +11,7 @@ interface ResponseMatch {
   id: number
   tournamentType: string
   tournamentName: string
+  seasonName: string
   homeScore: Score
   homePlayer: Player
   awayScore: Score
@@ -39,11 +40,9 @@ export class JsonApiMatchDataStore implements MatchRepository {
 
     const matches = allMatches
       .filter(match => {
-        const tournamentName = match.tournamentName
-
         return (
           match.tournamentType === "ATP" &&
-          tournamentName.indexOf("Doubles") === -1 &&
+          match.seasonName.indexOf("Singles") &&
           match.updatedAt > previousUpdatedAt
         )
       })
@@ -82,6 +81,7 @@ function mapToResponseMatches(jsonData: JsonApiMatchesResponse): ResponseMatch[]
         id: event.id,
         tournamentType: tournament.category.name,
         tournamentName: tournament.tournament.name,
+        seasonName: tournament.season.name,
         homeScore: mapToScore(event.homeScore),
         homePlayer: {
           id: event.homeTeam.id,

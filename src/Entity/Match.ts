@@ -5,6 +5,7 @@ interface MatchProps {
   id: number
   tournamentType: string
   tournamentName: string
+  seasonName: string
   homeScore: Score
   homePlayer: Player
   awayScore: Score
@@ -15,6 +16,7 @@ export class Match {
   id: number
   tournamentType: string
   tournamentName: string
+  seasonName: string
   homeScore: Score
   homePlayer: Player
   awayScore: Score
@@ -24,6 +26,7 @@ export class Match {
     this.id = props.id
     this.tournamentType = props.tournamentType
     this.tournamentName = props.tournamentName
+    this.seasonName = props.tournamentName
     this.homeScore = props.homeScore
     this.homePlayer = props.homePlayer
     this.awayScore = props.awayScore
