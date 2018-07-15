@@ -11,6 +11,7 @@ interface PostRequestBody {
   token: string
   channel: string
   username: string
+  text: string
   attachments: Array<{ fields: RequestBodyField[] }>
 }
 
@@ -18,6 +19,7 @@ interface UpdateRequestBody {
   token: string
   channel: string
   username: string
+  text: string
   attachments: Array<{ fields: RequestBodyField[] }>
   ts: string
 }
@@ -116,7 +118,8 @@ export class SlackApiPostMatchService implements PostMatchService {
     return {
       token: this.token,
       channel: this.channelNameId,
-      username: match.getMatchName(),
+      username: match.tournamentName,
+      text: match.getMatchName(),
       attachments: [
         {
           fields: [

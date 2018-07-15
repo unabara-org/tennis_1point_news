@@ -31,7 +31,7 @@ export class Match {
   }
 
   getMatchName(): string {
-    return `${this.tournamentName} | ${this.homePlayer.name} vs ${this.awayPlayer.name}`
+    return `${this.homePlayer.name} vs ${this.awayPlayer.name}`
   }
 
   getSetScoreText(): string {
@@ -45,7 +45,7 @@ export class Match {
 
   getPointScoreText(): string {
     if (this.homeScore.point == null || this.awayScore.point == null) {
-      return ''
+      return ""
     }
     return `${this.homeScore.point}-${this.awayScore.point}`
   }
