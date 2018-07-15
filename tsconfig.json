@@ -7,6 +7,7 @@
       "commonjs" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
     "lib": [
       "es5",
+      "es6",
       "es2015.promise",
       "esnext.asynciterable"
     ] /* Specify library files to be included in the compilation. */,
