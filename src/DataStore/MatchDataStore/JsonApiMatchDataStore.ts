@@ -43,7 +43,8 @@ export class JsonApiMatchDataStore implements MatchRepository {
         return (
           match.tournamentType === "ATP" &&
           match.seasonName.indexOf("Singles") &&
-          match.updatedAt > previousUpdatedAt
+          match.updatedAt > previousUpdatedAt &&
+          match.tournamentName.indexOf('Qualifying') > -1
         )
       })
       .map(responseMatch => {
