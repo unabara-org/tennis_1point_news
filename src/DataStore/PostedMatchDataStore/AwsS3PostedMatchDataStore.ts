@@ -50,8 +50,6 @@ export class AwsS3PostedMatchDataStore implements PostedMatchRepository {
       Key: this.dirName + `${postedMatch.postedMatchId}-${postedMatch.matchId}`,
     }
 
-    console.log("deleteByPostedMatch desu")
-
     await this.deleteObject(deleteParams)
     return undefined
   }
@@ -117,12 +115,9 @@ export class AwsS3PostedMatchDataStore implements PostedMatchRepository {
     return new Promise((resolve, reject) => {
       this.s3.deleteObject(params, function(err, data) {
         if (err) {
-          console.log("furukawa desu")
-          console.log(err)
           reject(err)
         }
-        console.log("shigematsu desu")
-        console.log(data)
+
         resolve(data)
       })
     })
