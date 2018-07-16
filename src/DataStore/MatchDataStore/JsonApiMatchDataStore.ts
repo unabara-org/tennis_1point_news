@@ -44,7 +44,7 @@ function isAtpSingles(match: ResponseMatch): boolean {
   return (
     match.tournamentType === "ATP" &&
     match.seasonName.indexOf("Singles") > -1 &&
-    match.tournamentName.indexOf("Qualifying") > -1
+    match.tournamentName.indexOf("Qualifying") === -1
   )
 }
 
