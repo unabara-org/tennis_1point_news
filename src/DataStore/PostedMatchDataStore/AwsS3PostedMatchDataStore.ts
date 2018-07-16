@@ -44,8 +44,16 @@ export class AwsS3PostedMatchDataStore implements PostedMatchRepository {
     return undefined
   }
 
-  deleteBypostedMatchId(postedMatchId: string): Promise<void> {
-    throw new Error("Method not implemented.")
+  async deleteByPostedMatch(postedMatch: PostedMatch): Promise<void> {
+    const deleteParams = {
+      ...this.postedMatchObjectParams,
+      Key: this.dirName + `${postedMatch.postedMatchId}-${postedMatch.matchId}`,
+    }
+
+    console.log('deleteByPostedMatch desu')
+
+    await this.deleteObject(deleteParams)
+    return undefined
   }
 
   private initializeForFindAll(): Promise<void> {
@@ -98,6 +106,23 @@ export class AwsS3PostedMatchDataStore implements PostedMatchRepository {
           reject(err)
         }
 
+        resolve(data)
+      })
+    })
+  }
+
+  private deleteObject(
+    params: aws.S3.Types.DeleteObjectRequest
+  ): Promise<aws.S3.Types.DeleteObjectOutput> {
+    return new Promise((resolve, reject) => {
+      this.s3.deleteObject(params, function(err, data) {
+        if (err) {
+          console.log("furukawa desu")
+          console.log(err)
+          reject(err)
+        }
+        console.log("shigematsu desu")
+        console.log(data)
         resolve(data)
       })
     })

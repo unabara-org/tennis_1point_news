@@ -5,7 +5,7 @@ import { AwsS3PostedMatchDataStore } from "../DataStore/PostedMatchDataStore/Aws
 export interface PostedMatchRepository {
   findAllPostedMatches(): Promise<PostedMatch[]>
   save(postedMatchId: PostedMatchId, match: Match): Promise<void>
-  deleteBypostedMatchId(postedMatchId: PostedMatchId): Promise<void>
+  deleteByPostedMatch(postedMatch: PostedMatch): Promise<void>
 }
 
 export function createPostedMatchRepository() {
