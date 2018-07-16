@@ -13,7 +13,6 @@ export const sendNotification: Handler = (
       cb(null, response)
     })
     .catch((err: Error) => {
-      console.log(err)
       const response = { statusCode: 500 }
       cb(null, response)
     })
@@ -30,7 +29,6 @@ export const cleanUpPostedMatchData: Handler = (
       cb(null, response)
     })
     .catch((err: Error) => {
-      console.log(err)
       const response = { statusCode: 500 }
       cb(null, response)
     })

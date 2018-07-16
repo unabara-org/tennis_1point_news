@@ -50,7 +50,7 @@ export class AwsS3PostedMatchDataStore implements PostedMatchRepository {
       Key: this.dirName + `${postedMatch.postedMatchId}-${postedMatch.matchId}`,
     }
 
-    console.log('deleteByPostedMatch desu')
+    console.log("deleteByPostedMatch desu")
 
     await this.deleteObject(deleteParams)
     return undefined
