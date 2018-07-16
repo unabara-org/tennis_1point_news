@@ -5,7 +5,7 @@ import { SlackApiPostMatchService } from "./Service/SlackApiService"
 
 const executeSendNotification = async (): Promise<void> => {
   const jsonApiMatchDataStore = createMatchRepository()
-  const matches = await jsonApiMatchDataStore.getUpdatedMatches(new Date())
+  const matches = await jsonApiMatchDataStore.getMatches(new Date())
   const slackApiPostMatchService = new SlackApiPostMatchService()
   const postedMatchRepository = createPostedMatchRepository()
 

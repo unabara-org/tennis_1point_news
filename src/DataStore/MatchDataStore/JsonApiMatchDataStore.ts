@@ -1,11 +1,9 @@
 import axios from "axios"
 import { Match } from "../../Entity/Match"
-import { Score } from "../../Entity/Score"
-import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
-import { MatchRepository } from "../../Repository/MatchRepository"
-import { AwsS3ChangeMatchDateDataStore } from "../ChangeMatchDateDataStore/AwsS3ChangeMatchDateDataStore"
 import { Player } from "../../Entity/Player"
-import { ChangeMatchDateRepository } from "../../Repository/ChangeMatchDataRepository"
+import { Score } from "../../Entity/Score"
+import { MatchRepository } from "../../Repository/MatchRepository"
+import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
 
 interface ResponseMatch {
   id: number
@@ -22,18 +20,10 @@ interface ResponseMatch {
 export class JsonApiMatchDataStore implements MatchRepository {
   private requestUrl = "https://www.sofascore.com/tennis/livescore/json"
 
-  private changeMatchDateDataStore: ChangeMatchDateRepository
-
-  constructor(changeMatchDateDataStore: ChangeMatchDateRepository) {
-    this.changeMatchDateDataStore = changeMatchDateDataStore
-  }
-
-  async getUpdatedMatches(date: Date): Promise<Match[]> {
+  async getMatches(date: Date): Promise<Match[]> {
     const response = await axios.get<JsonApiMatchesResponse>(this.requestUrl, {
       params: getQueryParams(date),
     })
-
-    const previousUpdatedAt = await this.changeMatchDateDataStore.get()
 
     const data = response.data
     const allMatches = mapToResponseMatches(data)
@@ -43,15 +33,12 @@ export class JsonApiMatchDataStore implements MatchRepository {
         return (
           match.tournamentType === "ATP" &&
           match.seasonName.indexOf("Singles") &&
-          match.updatedAt > previousUpdatedAt &&
-          match.tournamentName.indexOf('Qualifying') > -1
+          match.tournamentName.indexOf("Qualifying") > -1
         )
       })
       .map(responseMatch => {
         return new Match(responseMatch)
       })
-
-    await this.changeMatchDateDataStore.save(date)
 
     return matches
   }
