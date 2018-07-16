@@ -30,11 +30,7 @@ export class JsonApiMatchDataStore implements MatchRepository {
 
     const matches = allMatches
       .filter(match => {
-        return (
-          match.tournamentType === "ATP" &&
-          match.seasonName.indexOf("Singles") &&
-          match.tournamentName.indexOf("Qualifying") > -1
-        )
+        return isAtpSingles(match)
       })
       .map(responseMatch => {
         return new Match(responseMatch)
@@ -42,6 +38,14 @@ export class JsonApiMatchDataStore implements MatchRepository {
 
     return matches
   }
+}
+
+function isAtpSingles(match: ResponseMatch): boolean {
+  return (
+    match.tournamentType === "ATP" &&
+    match.seasonName.indexOf("Singles") > -1 &&
+    match.tournamentName.indexOf("Qualifying") > -1
+  )
 }
 
 interface SofaScoreRequestParams {
