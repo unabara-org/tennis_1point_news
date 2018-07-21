@@ -9,7 +9,6 @@ interface ResponseMatch {
   id: number
   tournamentType: string
   tournamentName: string
-  seasonName: string
   homeScore: Score
   homePlayer: Player
   awayScore: Score
@@ -43,7 +42,7 @@ export class JsonApiMatchDataStore implements MatchRepository {
 function isAtpSingles(match: ResponseMatch): boolean {
   return (
     match.tournamentType === "ATP" &&
-    match.seasonName.indexOf("Singles") > -1 &&
+    match.tournamentName.indexOf("Singles") > -1 &&
     match.tournamentName.indexOf("Qualifying") === -1
   )
 }
@@ -73,7 +72,6 @@ function mapToResponseMatches(jsonData: JsonApiMatchesResponse): ResponseMatch[]
         id: event.id,
         tournamentType: tournament.category.name,
         tournamentName: tournament.tournament.name,
-        seasonName: tournament.season.name,
         homeScore: mapToScore(event.homeScore),
         homePlayer: {
           id: event.homeTeam.id,

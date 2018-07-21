@@ -7,7 +7,7 @@ export interface JsonApiMatchesResponse {
       category: {
         name: string
       }
-      season: {
+      season?: {
         name: string
       }
       events: Array<{
