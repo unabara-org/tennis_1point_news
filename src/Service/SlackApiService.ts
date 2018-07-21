@@ -1,6 +1,10 @@
-import { Match } from "../Entity/Match"
 import axios from "axios"
+import { Match } from "../Entity/Match"
 import { PostedMatch, PostedMatchId } from "../Entity/PostedMatch"
+import {
+  MatchImageRepository,
+  createMatchImageRepository,
+} from "../Repository/MatchImageRepository"
 
 interface PostMatchService {
   post(match: Match): Promise<PostedMatch>
@@ -45,6 +49,10 @@ interface PostResponse {
   }
 }
 
+export function createPostMatchService() {
+  return new SlackApiPostMatchService(createMatchImageRepository())
+}
+
 export class SlackApiPostMatchService implements PostMatchService {
   private readonly requestUrl = {
     post: "https://slack.com/api/chat.postMessage",
@@ -53,11 +61,13 @@ export class SlackApiPostMatchService implements PostMatchService {
   private readonly token = process.env.SLACK_TOKEN!
   private readonly channelNameId = process.env.SLACK_CHANNEL_NAME_ID!
 
+  constructor(private matchImageRepository: MatchImageRepository) {}
+
   /**
    * 試合情報を投稿する
    */
   async post(match: Match): Promise<PostedMatch> {
-    const requestJsonData: PostRequestBody = this.buildRequestBody(match)
+    const requestJsonData: PostRequestBody = await this.buildRequestBody(match)
 
     const response = await this.request(this.requestUrl.post!, requestJsonData)
 
@@ -76,7 +86,7 @@ export class SlackApiPostMatchService implements PostMatchService {
    */
   async update(postedMatchId: string, match: Match): Promise<PostedMatch> {
     const requestJsonData: UpdateRequestBody = {
-      ...this.buildRequestBody(match),
+      ...(await this.buildRequestBody(match)),
       ts: postedMatchId,
     }
 
@@ -114,12 +124,14 @@ export class SlackApiPostMatchService implements PostMatchService {
   /*
    * RequestBody を生成する
    */
-  private buildRequestBody = (match: Match): PostRequestBody => {
+  private buildRequestBody = async (match: Match): Promise<PostRequestBody> => {
+    const matchImageUrl = await this.matchImageRepository.getImageUrl(match)
+
     return {
       token: this.token,
       channel: this.channelNameId,
       username: match.tournamentName,
-      text: match.getMatchName(),
+      text: `${match.getMatchName()}\n\n${matchImageUrl}`,
       attachments: [
         {
           fields: [
