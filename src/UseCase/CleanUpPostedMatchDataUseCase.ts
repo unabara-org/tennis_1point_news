@@ -1,7 +1,9 @@
 import { createMatchRepository } from "../Repository/MatchRepository"
 import { createPostedMatchRepository } from "../Repository/PostedMatchRepository"
+import { createMatchImageRepository } from "../Repository/MatchImageRepository"
 
 export const executeCleanUpPostedMatchData = async (): Promise<void> => {
+  const matchImageRepository = createMatchImageRepository()
   const jsonApiMatchDataStore = createMatchRepository()
   const liveMatches = await jsonApiMatchDataStore.getMatches(new Date())
 
@@ -15,6 +17,7 @@ export const executeCleanUpPostedMatchData = async (): Promise<void> => {
 
     if (isFinishedMatch) {
       await postedMatchRepository.deleteByPostedMatch(postedMatch)
+      await matchImageRepository.deleteByMatchId(postedMatch.matchId)
     }
   }
 }

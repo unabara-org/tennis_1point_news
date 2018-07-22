@@ -11,7 +11,6 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
   private readonly imageBaseUrl = `https://s3.amazonaws.com/${this.bucketName}/`
   private readonly objectParams = {
     Bucket: this.bucketName,
-    ACL: "public-read",
   }
 
   /**
@@ -23,6 +22,7 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
 
       const params = {
         ...this.objectParams,
+        ACL: "public-read",
         Key: this.getKeyName(match),
         Body: imageData,
       }
@@ -33,6 +33,23 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
         }
 
         resolve(`${this.imageBaseUrl}${this.getKeyName(match)}`)
+      })
+    })
+  }
+
+  public deleteByMatchId(matchId: number): Promise<void> {
+    const params = {
+      ...this.objectParams,
+      Key: this.getKeyNameByMatchId(matchId),
+    }
+
+    return new Promise((resolve, reject) => {
+      this.s3.deleteObject(params, (err, data) => {
+        if (err != null) {
+          reject(err)
+        }
+
+        resolve()
       })
     })
   }
@@ -48,5 +65,12 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
    */
   private getKeyName(match: Match): string {
     return `matchImages/${match.id}.png`
+  }
+
+  /**
+   * s3 で使う Key を返す
+   */
+  private getKeyNameByMatchId(matchId: number): string {
+    return `matchImages/${matchId}.png`
   }
 }
