@@ -2,7 +2,6 @@ import aws from "aws-sdk"
 import fs from "fs"
 import { MatchImageRepository } from "../../Repository/MatchImageRepository"
 import { Match } from "../../Entity/Match"
-import { resolve } from "dns"
 
 export class AwsS3MatchImageDataStore implements MatchImageRepository {
   private readonly s3 = new aws.S3()
@@ -20,11 +19,14 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
     return new Promise((resolve, reject) => {
       const imageData = fs.readFileSync(filePath)
 
+      // いまは png だけ
+      // 好きに mimetype を取得する実装に変更してくれ
       const params = {
         ...this.objectParams,
         ACL: "public-read",
         Key: this.getKeyName(match),
         Body: imageData,
+        ContentType: "image/png",
       }
 
       this.s3.putObject(params, (err, data) => {

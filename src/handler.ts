@@ -13,7 +13,8 @@ export const sendNotification: Handler = (
       cb(null, response)
     })
     .catch((err: Error) => {
-      const response = { statusCode: 500 }
+      console.log(err)
+      const response = { statusCode: 500, err: err }
       cb(null, response)
     })
 }
