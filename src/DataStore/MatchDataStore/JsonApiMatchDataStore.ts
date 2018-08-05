@@ -42,7 +42,7 @@ export class JsonApiMatchDataStore implements MatchRepository {
 function isAtpSingles(match: ResponseMatch): boolean {
   return (
     match.tournamentType === "ATP" &&
-    match.tournamentName.indexOf("Singles") > -1 &&
+    match.tournamentName.indexOf("Doubles") === -1 &&
     match.tournamentName.indexOf("Qualifying") === -1
   )
 }
