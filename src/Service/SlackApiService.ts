@@ -125,7 +125,7 @@ export class SlackApiPostMatchService implements PostMatchService {
    * RequestBody を生成する
    */
   private buildRequestBody = async (match: Match): Promise<PostRequestBody> => {
-    const matchImageUrl = await this.matchImageRepository.getImageUrl(match)
+    const matchImageUrl = this.matchImageRepository.getImageUrl(match)
 
     return {
       token: this.token,
