@@ -9,6 +9,14 @@ interface MatchProps {
   homePlayer: Player
   awayScore: Score
   awayPlayer: Player
+  status: MatchStatus
+  wonPlayerId?: number
+}
+
+export enum MatchStatus {
+  NotStarted,
+  InProgress,
+  Finished
 }
 
 export class Match {
@@ -19,6 +27,8 @@ export class Match {
   homePlayer: Player
   awayScore: Score
   awayPlayer: Player
+  status: MatchStatus
+  wonPlayerId?: number
 
   constructor(props: MatchProps) {
     this.id = props.id
@@ -28,10 +38,12 @@ export class Match {
     this.homePlayer = props.homePlayer
     this.awayScore = props.awayScore
     this.awayPlayer = props.awayPlayer
+    this.status = props.status
+    this.wonPlayerId = props.wonPlayerId
   }
 
   getMatchName(): string {
-    return `${this.homePlayer.name} vs ${this.awayPlayer.name}`
+    return `${this.getPlayerNameText(this.homePlayer)} vs ${this.getPlayerNameText(this.awayPlayer)}`
   }
 
   getSetScoreText(): string {
@@ -48,5 +60,14 @@ export class Match {
       return ""
     }
     return `${this.homeScore.point}-${this.awayScore.point}`
+  }
+
+  private getPlayerNameText(player: Player): string {
+    const trophyIcon = "%F0%9F%8F%86"
+
+    if (this.status == MatchStatus.Finished && this.wonPlayerId != null && this.wonPlayerId === player.id) {
+      return `${trophyIcon} ${player.name}`
+    }
+    return player.name
   }
 }

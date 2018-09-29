@@ -6,7 +6,7 @@ import { createMatchImageRepository } from "../Repository/MatchImageRepository"
 
 export const executeSendNotification = async (): Promise<void> => {
   const jsonApiMatchDataStore = createMatchRepository()
-  const matches = await jsonApiMatchDataStore.getMatches(new Date())
+  const matches = await jsonApiMatchDataStore.getInProgressOrFinishedMatches(new Date())
   const matchImageRepository = createMatchImageRepository()
   const slackApiPostMatchService = new SlackApiPostMatchService(matchImageRepository)
   const matchImageCreateService = new MatchImageCreateService()

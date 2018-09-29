@@ -1,9 +1,10 @@
 import axios from "axios"
-import { Match } from "../../Entity/Match"
+import { Match, MatchStatus } from "../../Entity/Match"
 import { Player } from "../../Entity/Player"
 import { Score } from "../../Entity/Score"
 import { MatchRepository } from "../../Repository/MatchRepository"
-import { JsonApiMatchesResponse, JsonApiMatchesResponseScore } from "./JsonApiMatchesResponse"
+import { JsonApiMatchesResponse, JsonApiMatchesResponseScore, JsonApiMatchResponseStatus, JsonApiMatchesResponseMatch } from "./JsonApiMatchesResponse"
+import { zeroPad } from "../../Util/zeroPad"
 
 interface ResponseMatch {
   id: number
@@ -14,13 +15,21 @@ interface ResponseMatch {
   awayScore: Score
   awayPlayer: Player
   updatedAt: Date
+  status: MatchStatus
+  wonPlayerId?: number
 }
 
 export class JsonApiMatchDataStore implements MatchRepository {
-  private requestUrl = "https://www.sofascore.com/tennis/livescore/json"
+  async getInProgressOrFinishedMatches(date: Date): Promise<Match[]> {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = zeroPad((now.getMonth() + 1).toString(), 2)
+    const day = zeroPad(now.getDay().toString(), 2)
+    const dateForRequest = `${year}-${month}-${day}`
 
-  async getMatches(date: Date): Promise<Match[]> {
-    const response = await axios.get<JsonApiMatchesResponse>(this.requestUrl, {
+    const url = `https://www.sofascore.com/tennis//${dateForRequest}/json`
+
+    const response = await axios.get<JsonApiMatchesResponse>(url, {
       params: getQueryParams(date),
     })
 
@@ -30,6 +39,12 @@ export class JsonApiMatchDataStore implements MatchRepository {
     const matches = allMatches
       .filter(match => {
         return isAtpSingles(match)
+      })
+      .filter(match => {
+        return (
+          match.status === MatchStatus.Finished ||
+          match.status === MatchStatus.InProgress
+        )
       })
       .map(responseMatch => {
         return new Match(responseMatch)
@@ -85,6 +100,8 @@ function mapToResponseMatches(jsonData: JsonApiMatchesResponse): ResponseMatch[]
           name: event.awayTeam.name,
         },
         updatedAt: new Date(event.changes.changeDate),
+        status: mapToMatchStatus(event),
+        wonPlayerId: mapToWonPlayerId(event)
       })
     })
   })
@@ -109,5 +126,30 @@ export function mapToScore(responseScore: JsonApiMatchesResponseScore): Score {
     winnerSet: responseScore.current,
     game: game,
     point: responseScore.point,
+  }
+}
+
+function mapToMatchStatus(match: JsonApiMatchesResponseMatch): MatchStatus {
+  switch (match.status.type) {
+    case 'notstarted':
+    return MatchStatus.NotStarted
+    case 'inprogress':
+    return MatchStatus.InProgress
+    case 'finished':
+    return MatchStatus.Finished
+    
+  }
+}
+
+function mapToWonPlayerId(match: JsonApiMatchesResponseMatch): number | undefined {
+  switch (match.winnerCode) {
+    case 0:
+    return undefined
+    case 1:
+      return match.homeTeam.id
+    case 2:
+      return match.awayTeam.id
+    default:
+      throw new Error()
   }
 }

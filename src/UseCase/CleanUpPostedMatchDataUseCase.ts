@@ -5,7 +5,7 @@ import { createMatchImageRepository } from "../Repository/MatchImageRepository"
 export const executeCleanUpPostedMatchData = async (): Promise<void> => {
   const matchImageRepository = createMatchImageRepository()
   const jsonApiMatchDataStore = createMatchRepository()
-  const liveMatches = await jsonApiMatchDataStore.getMatches(new Date())
+  const liveMatches = await jsonApiMatchDataStore.getInProgressOrFinishedMatches(new Date())
 
   const postedMatchRepository = createPostedMatchRepository()
   const postedMatches = await postedMatchRepository.findAllPostedMatches()
