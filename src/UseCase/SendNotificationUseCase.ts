@@ -4,9 +4,6 @@ import { SlackApiPostMatchService } from "../Service/SlackApiService"
 import { MatchImageCreateService } from "../Service/MatchImageCreateService"
 import { createMatchImageRepository } from "../Repository/MatchImageRepository"
 
-// factory メソッドを UseCase の中身で呼び出してるから依存 100 % やん
-// ほんとは高階関数つかうなり constructor インジェクションしなきゃ
-
 export const executeSendNotification = async (): Promise<void> => {
   const jsonApiMatchDataStore = createMatchRepository()
   const matches = await jsonApiMatchDataStore.getMatches(new Date())
