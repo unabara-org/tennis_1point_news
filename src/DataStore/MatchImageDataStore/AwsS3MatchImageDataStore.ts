@@ -57,8 +57,7 @@ export class AwsS3MatchImageDataStore implements MatchImageRepository {
   }
 
   public getImageUrl(match: Match): string {
-    const currentTimeStamp = (new Date()).getTime();
-    return `${this.imageBaseUrl}${this.getKeyName(match)}?${currentTimeStamp.toString()}`
+    return `${this.imageBaseUrl}${this.getKeyName(match)}`
   }
 
   /**

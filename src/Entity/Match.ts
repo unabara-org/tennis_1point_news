@@ -63,7 +63,7 @@ export class Match {
   }
 
   private getPlayerNameText(player: Player): string {
-    const trophyIcon = "%F0%9F%8F%86"
+    const trophyIcon = ":trophy:"
 
     if (this.status == MatchStatus.Finished && this.wonPlayerId != null && this.wonPlayerId === player.id) {
       return `${trophyIcon} ${player.name}`
