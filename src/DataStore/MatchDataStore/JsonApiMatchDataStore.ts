@@ -24,7 +24,7 @@ export class JsonApiMatchDataStore implements MatchRepository {
     const now = new Date()
     const year = now.getFullYear()
     const month = zeroPad((now.getMonth() + 1).toString(), 2)
-    const day = zeroPad(now.getDay().toString(), 2)
+    const day = zeroPad(now.getDate().toString(), 2)
     const dateForRequest = `${year}-${month}-${day}`
 
     const url = `https://www.sofascore.com/tennis//${dateForRequest}/json`
@@ -144,6 +144,7 @@ function mapToMatchStatus(match: JsonApiMatchesResponseMatch): MatchStatus {
 function mapToWonPlayerId(match: JsonApiMatchesResponseMatch): number | undefined {
   switch (match.winnerCode) {
     case 0:
+    case undefined:
     return undefined
     case 1:
       return match.homeTeam.id
